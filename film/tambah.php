@@ -2,38 +2,39 @@
 
 include('config/db.php');
 include('classes/DB.php');
-include('classes/Divisi.php');
-include('classes/Jabatan.php');
-include('classes/Pengurus.php');
+include('classes/Film.php');
+include('classes/Sutradara.php');
+include('classes/GEnre.php');
 include('classes/Template.php'); 
 
-$pengurus = new Pengurus($DB_HOST, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
-$pengurus->open();
+$film = new Film($DB_HOST, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
+$film->open();
 
 // buat instance pengurus
-$divisi = new Divisi($DB_HOST, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
-$divisi->open();
-$divisi->getDivisi();
+$sutradara = new Sutradara($DB_HOST, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
+$sutradara->open();
+$sutradara->getSutradara();
 
-$jabatan = new Jabatan($DB_HOST, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
-$jabatan->open();
-$jabatan->getJabatan();
+$genre = new Genre($DB_HOST, $DB_USERNAME, $DB_PASSWORD, $DB_NAME);
+$genre->open();
+$genre->getGenre();
 
 $data = null;
 
 if (isset($_POST['btn-simpan'])){
     $data = [
-        'pengurus_foto' => $_FILES['foto']['name'],
-        'pengurus_nama' => $_POST['nama'],
-        'pengurus_nim' => $_POST['nim'],
-        'pengurus_semester' => $_POST['semester'],
-        'divisi_id' => $_POST['division'],
-        'jabatan_id' => $_POST['jabatan']
+        'judul_film' => $_POST['judul_film'],
+        'tahun' => $_POST['tahun'],
+        'sutradara_id' => $_POST['sutradara_id'],
+        'genre_id' => $_POST['genre_id'],
+        'foto' => $_FILES['foto']['name']
+
+        
     ];
     
     $file = $_FILES['foto'];
 
-    $result = $pengurus->addData($data, $file);
+    $result = $film->addData($data, $file);
 
     if ($result > 0) {
         echo "<script>
@@ -48,26 +49,26 @@ if (isset($_POST['btn-simpan'])){
     }
 }
 
-$dataDivisi = null;
-$dataJabatan = null;
+$dataSutradara = null;
+$dataGenre = null;
 
-while ($div = $divisi->getResult()) {
-    $dataDivisi .= '<option value="' . $div['divisi_id'] . '">' . $div['divisi_nama'] . '</option>';
+while ($div = $sutradara->getResult()) {
+    $dataSutradara .= '<option value="' . $div['id_sutradara'] . '">' . $div['nama_sutradara'] . '</option>';
 }
 
-while ($jbt = $jabatan->getResult()) {
-    $dataJabatan .= '<option value="' . $jbt['jabatan_id'] . '">' . $jbt['jabatan_nama'] . '</option>';
+while ($jbt = $genre->getResult()) {
+    $dataGenre .= '<option value="' . $jbt['id_genre'] . '">' . $jbt['nama_genre'] . '</option>';
 }
 
 // buat instance template
 $view = new Template('templates/skinform.html');
 
-$view->replace('DATA_DIVISI', $dataDivisi);
-$view->replace('DATA_JABATAN', $dataJabatan);
+$view->replace('DATA_DIVISI', $dataSutradara);
+$view->replace('DATA_JABATAN', $dataGenre);
 $view->replace('DATA_BTN', 'Tambah');
 
 $view->write();
 
 // tutup koneksi
-$divisi->close();
-$jabatan->close();
+$sutradara->close();
+$genre->close();
